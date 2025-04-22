@@ -2,12 +2,26 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Cards({ data, icons, onEdit, onDelete, onCardPress, renderKeys }) {
+
+    function formatFirebaseDate(timestamp) {
+        if (!timestamp || !timestamp.seconds) return "";
+
+        const date = new Date(timestamp.seconds * 1000);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0"); // mês começa do zero
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
+
+
     return (
         <FlatList
             data={data}
             keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
             renderItem={({ item }) => {
                 // Componente de conteúdo do card (reutilizável)
+
                 const CardContent = () => (
                     <>
                         {icons && (
@@ -30,6 +44,8 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                             <>
                                 {renderKeys.map((key) => {
                                     const val = item[key]
+                                    // console.log(val instanceof Object)
+                                    // return console.log(key,val)
                                     if (val != undefined) {
                                         if (key === "title") {
                                             return (
@@ -37,6 +53,28 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                                                     <Text style={styles.cardTitleText}>{val}</Text>
                                                 </View>
                                             );
+                                        }
+
+                                        if (val instanceof Object) {
+
+                                            return (
+                                                <Text style={styles.cardText} key={key}>
+                                                    <Text style={{ fontWeight: "bold", paddingHorizontal: 5 }}>{key}: </Text>
+                                                    <Text>{formatFirebaseDate(val)}</Text>
+                                                </Text>
+                                            )
+
+
+                                        }
+
+                                        if (val instanceof Date) {
+                                            return (
+
+                                                <Text style={styles.cardText} key={key}>
+                                                    <Text style={{ fontWeight: "bold", paddingHorizontal: 5 }}>{key}: </Text>
+                                                    <Text>{val.toLocaleDateString("pt-BR")}</Text>
+                                                </Text>
+                                            )
                                         }
                                         return (
                                             <Text style={styles.cardText} key={key}>
@@ -87,6 +125,11 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                     </View>
                 );
             }}
+            ListEmptyComponent={() => (
+                <View style={{ padding: 20, alignItems: 'center' }}>
+                    <Text style={{ color: "#555", fontSize: 16 }}>Nenhum card disponível</Text>
+                </View>
+            )}
         />
     )
 }

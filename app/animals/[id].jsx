@@ -42,9 +42,10 @@ function Animals() {
         const userData = userSnapshot.data();
         const allAnimals = userData.animais || [];
         const farmAnimals = allAnimals.filter((animal) => animal.farmId === id);
+        const farm = userData.fazendas.find((farm) => farm.id === id)
 
         setFilteredAnimals(farmAnimals || []);
-        setFarmName(userData.fazendas.find((farm) => farm.id === id)?.name)
+        setFarmName(farm?.nome)
         setDataLoading(false)
 
     }

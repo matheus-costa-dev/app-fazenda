@@ -18,15 +18,22 @@ export default function Index() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [newFarmName, setNewFarmName] = useState("");
+  const [newFarmOwner, setNewFarmOwner] = useState("")
   const [newFarmAddress, setNewFarmAddress] = useState("");
+  const [newFarmEmail, setNewFarmEmail] = useState("");
+  const [newFarmPhone, setNewFarmPhone] = useState("");
   const [farms, setFarms] = useState([]);
+  const [animals, setAnimals] = useState([])
   const { user, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editFarmId, setEditFarmId] = useState("")
   const [dataLoading, setDataLoading] = useState(true)
+  const ownerRef = useRef(null)
   const addressRef = useRef(null)
+  const emailRef = useRef(null)
+  const phoneRef = useRef(null)
 
-  
+
 
   useEffect(() => {
     navigation.setOptions({
@@ -45,19 +52,22 @@ export default function Index() {
     const userSnapshot = await getDoc(userDoc);
     const userData = userSnapshot.data();
     setFarms(userData.fazendas || []);
-
+    setAnimals(userData.animais || [])
     setDataLoading(false)
   }
 
   async function onHandleAddFarm() {
- 
+
     try {
       const newFarm = {
         id: v4(),
-        name: newFarmName,
-        localization: newFarmAddress,
+        nome: newFarmName,
+        proprietario: newFarmOwner,
+        endereco: newFarmAddress,
+        email: newFarmEmail,
+        telefone: newFarmPhone,
       };
-  
+
       const userDoc = doc(db, "users", user.uid);
       await updateDoc(userDoc, {
         fazendas: arrayUnion(newFarm),
@@ -65,8 +75,7 @@ export default function Index() {
 
       fetchData()
       setModalVisible(false);
-      setNewFarmName("");
-      setNewFarmAddress("");
+
     } catch (error) {
       console.error(error)
       AlertMessage(`Erro ao adicionar fazenda\n${error.message}`)
@@ -74,73 +83,104 @@ export default function Index() {
 
   }
 
-  async function onEdit(farm){
+  async function onEdit(farm) {
     setIsEditing(true)
     setModalVisible(true);
-    setNewFarmName(farm.name);
-    setNewFarmAddress(farm.localization);
+
     setEditFarmId(farm.id)
+    setNewFarmName(farm.nome);
+    setNewFarmOwner(farm.proprietario)
+    setNewFarmAddress(farm.endereco);
+    setNewFarmEmail(farm.email)
+    setNewFarmPhone(farm.telefone)
     
+
   }
 
-  async function onHandleEditFarm(){
+  async function onHandleEditFarm() {
 
 
     try {
-      const farmEdit ={
+      const farmEdit = {
         id: editFarmId,
-        name: newFarmName,
-        localization: newFarmAddress,
+        nome: newFarmName,
+        proprietario: newFarmOwner,
+        endereco: newFarmAddress,
+        email: newFarmEmail,
+        telefone: newFarmPhone,
       }
-      const userDoc = doc(db, "users",user.uid)
+      const userDoc = doc(db, "users", user.uid)
       await updateDoc(userDoc, {
         fazendas: arrayRemove(farms.find(farm => farm.id === editFarmId))
       })
-  
+
       await updateDoc(userDoc, {
         fazendas: arrayUnion(farmEdit)
       })
-  
+
       setIsEditing(false)
-      setNewFarmName("")
-      setNewFarmAddress("")
       setModalVisible(false)
-      
+
       setFarms((prev) => {
         return [...prev.filter(farm => farm.id !== editFarmId), farmEdit]
       })
 
     } catch (error) {
-      AlertMessage(`Erro ao editar fazenda\n${error.message}`)  
+      AlertMessage(`Erro ao editar fazenda\n${error.message}`)
     }
-    
+
   }
 
 
-  async function onDelete(farmId){
-    const userDoc = doc(db,"users",user.uid)
-    const farmToDelete = farms.find(farm => farm.id == farmId)
-    await updateDoc(userDoc, {
-      fazendas: arrayRemove(farmToDelete)
-    });
-    
-    setFarms((prev)=>{
-      return prev.filter(farm => farm.id !== farmId)  
-    })
+  async function onDelete(farmId) {
+
+    try {
+      const userDoc = doc(db, "users", user.uid)
+      const farmToDelete = farms.find(farm => farm.id == farmId)
+      await updateDoc(userDoc, {
+        fazendas: arrayRemove(farmToDelete)
+      });
+
+      setFarms((prev) => {
+        return prev.filter(farm => farm.id !== farmId)
+      })
+
+      const animalToRemove = animals.find((animal) => animal.farmId === farmId);
+
+      if (animalToRemove) {
+        await updateDoc(userDoc, {
+          animais: arrayRemove(animalToRemove)
+        });
+      }
+
+    } catch (error) {
+      console.log(error)
+      AlertMessage(error)
+    }
+
   }
 
-  function onCardPress(id){
+  function onCardPress(id) {
     router.push(`/animals/${id}`);
+  }
+
+  function clearForm(){
+    setNewFarmName("");
+    setNewFarmOwner("")
+    setNewFarmAddress("");
+    setNewFarmEmail("")
+    setNewFarmPhone("")
+
   }
 
 
   if (loading || dataLoading) {
     return (
-        <View style={{flex:1, justifyContent:"center",alignContent:"center", backgroundColor:"#DBFFCB"}}>
-            <ActivityIndicator size={"large"} />
-        </View>
+      <View style={{ flex: 1, justifyContent: "center", alignContent: "center", backgroundColor: "#DBFFCB" }}>
+        <ActivityIndicator size={"large"} />
+      </View>
     )
-}
+  }
 
 
 
@@ -156,7 +196,12 @@ export default function Index() {
 
 
       <FloatButton iconName={"add-outline"} onPress={() => setModalVisible(true)} />
-      <CustomModal modalTitle={"Adicionar fazenda"} modalVisible={modalVisible} setModalVisible={setModalVisible}>
+      <CustomModal 
+      modalTitle={"Adicionar fazenda"} 
+      modalVisible={modalVisible} 
+      setModalVisible={setModalVisible}
+      onRequestClose={clearForm}
+      >
         <RenderInput
           icon={"home-outline"}
           placeholder={"Nome da fazenda"}
@@ -164,7 +209,18 @@ export default function Index() {
           setValue={setNewFarmName}
           isPassword={false}
           keyboardType={"default"}
+          onSubmitEditing={() => ownerRef.current?.focus()}
+        />
+
+        <RenderInput
+          icon={"person-outline"}
+          placeholder={"Nome do proprietário"}
+          value={newFarmOwner}
+          setValue={setNewFarmOwner}
+          isPassword={false}
+          keyboardType={"default"}
           onSubmitEditing={() => addressRef.current?.focus()}
+          ref={ownerRef}
         />
         <RenderInput
           icon={"location-outline"}
@@ -174,19 +230,47 @@ export default function Index() {
           isPassword={false}
           keyboardType={"default"}
           ref={addressRef}
+          onSubmitEditing={() => emailRef.current?.focus()}
+        />
+        <RenderInput
+          icon={"mail-outline"}
+          placeholder={"Email"}
+          value={newFarmEmail}
+          setValue={setNewFarmEmail}
+          isPassword={false}
+          keyboardType={"email-address"}
+          ref={emailRef}
+          onSubmitEditing={() => phoneRef.current?.focus()}
+        />
+        <RenderInput
+          icon={"phone-portrait-outline"}
+          placeholder={"Telefone"}
+          value={newFarmPhone}
+          setValue={setNewFarmPhone}
+          isPassword={false}
+          keyboardType={"phone-pad"}
+          ref={phoneRef}
           onSubmitEditing={() => isEditing ? onHandleEditFarm() : onHandleAddFarm()}
         />
 
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <CustomButon
             buttonText={"Cancelar"}
-            onPress={() => setModalVisible(false)}
+            onPress={() => { 
+              setModalVisible(false)
+              setIsEditing(false)
+              clearForm()
+            }}
             customTouchableStyle={styles.cancelButton}
+            
           />
 
           <CustomButon
             buttonText={isEditing ? "Editar" : "Adicionar"}
-            onPress={() => isEditing ? onHandleEditFarm() : onHandleAddFarm()}
+            onPress={() => {
+              isEditing ? onHandleEditFarm() : onHandleAddFarm()
+              clearForm()
+            }}
             customButtonStyle={{ color: "#fff", backgroundColor: "#4CAF50" }} // verde mais claro
             customTouchableStyle={{ backgroundColor: "#4CAF50" }} // verde mais claro
           />

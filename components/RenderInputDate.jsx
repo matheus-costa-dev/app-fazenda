@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View, TextInput, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { forwardRef } from "react";
 
-function RenderInput({ icon, placeholder, value, setValue, isPassword, keyboardType, onSubmitEditing, onPress, editable }, ref) {
+function RenderInput({ icon, placeholder, value, setValue, keyboardType, onSubmitEditing, onPress, editable }, ref) {
     return (
-        <View style={styles.inputContainer}>
+        <TouchableOpacity style={styles.inputContainer} onPress={onPress}>
             <Ionicons name={icon} size={20} color={"#6c63ff"} style={styles.inputIcon} />
             <TextInput
                 placeholder={placeholder}
@@ -12,14 +12,12 @@ function RenderInput({ icon, placeholder, value, setValue, isPassword, keyboardT
                 value={value}
                 onChangeText={setValue}
                 placeholderTextColor="#aaa"
-                secureTextEntry={isPassword}
                 keyboardType={keyboardType}
                 onSubmitEditing={onSubmitEditing}
-                onPress={onPress}
                 ref={ref} // Encaminha a ref para o TextInput
                 editable={editable}
             />
-        </View>
+        </TouchableOpacity>
     );
 }
 

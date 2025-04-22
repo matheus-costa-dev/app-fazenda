@@ -1,12 +1,15 @@
 import { Modal, View, Text,StyleSheet } from "react-native"
 
-export default function CustomModal({ modalVisible, setModalVisible, modalTitle, children }) {
+export default function CustomModal({ modalVisible, setModalVisible, modalTitle, children, onRequestClose }) {
     return (
         <Modal
             visible={modalVisible}
             transparent
             animationType="slide"
-            onRequestClose={() => setModalVisible(false)}
+            onRequestClose={() => {
+                setModalVisible(false)
+                onRequestClose
+            }}
         >
             <View style={styles.modalOverlay}>
                 <View style={styles.modalContainer}>

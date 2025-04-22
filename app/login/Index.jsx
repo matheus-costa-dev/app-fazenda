@@ -3,7 +3,6 @@ import {
     Text,
     TouchableOpacity,
     StyleSheet,
-    Alert,
     Platform,
     ScrollView,
     ActivityIndicator
@@ -17,6 +16,7 @@ import { db } from "../../firebase/firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "expo-router";
 import { AlertMessage } from "../../functions/Alert";
+import {buttonCancelStyle, buttonSubmitStyle} from "../../styles/app"
 
 
 
@@ -168,14 +168,15 @@ export default function LoginScreen() {
                     <CustomButton
                         buttonText={"Cancelar"}
                         onPress={() => setModalVisible(false)}
-                        customTouchableStyle={{ backgroundColor: "white", borderWidth: 1, borderColor: "red" }}
-                        customButtonStyle={styles.cancelButton}
+                        customTouchableStyle={buttonCancelStyle.customTouchableStyle}
+                        customButtonStyle={buttonCancelStyle.customButtonStyle}
                     />
 
                     <CustomButton
                         buttonText={"Cadastrar"}
                         onPress={onSignUp}
-                        customButtonStyle={{ color: "white" }}
+                        customTouchableStyle={buttonSubmitStyle.customTouchableStyle}
+                        customButtonStyle={buttonSubmitStyle.customButtonStyle}
                     />
 
 

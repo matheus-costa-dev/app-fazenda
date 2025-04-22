@@ -1,8 +1,9 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Dimensions } from "react-native";
 import { BarChart } from "react-native-chart-kit";
-import { useWindowDimensions } from "react-native";
 
-export default function ChartsRoute({ filteredAnimals }) {
+function ChartsRoute({ filteredAnimals }) {
+    const {width, height} = Dimensions.get("window")
+
     if (!filteredAnimals || filteredAnimals.length === 0) {
         return (
             <View style={styles.container}>
@@ -11,8 +12,14 @@ export default function ChartsRoute({ filteredAnimals }) {
         );
     }
 
-    const windowWidth = useWindowDimensions().width;
-    const windowHeight = useWindowDimensions().height;
+    // return (
+    //     <View style={styles.container}>
+    //         <Text style={styles.chartsText}>Nenhum dado disponível para exibir gráficos.</Text>
+    //     </View>
+    // );
+
+
+
 
     // Processamento dos dados sem arquero
     const categories = ["cio", "prenha", "inseminado"];
@@ -34,8 +41,8 @@ export default function ChartsRoute({ filteredAnimals }) {
         <View style={styles.container}>
             <BarChart
                 data={chartData}
-                width={windowWidth * 0.9} // Largura do gráfico
-                height={windowHeight * 0.5} // Altura do gráfico
+                width={width * 0.9}
+                height={height * 0.5}
                 fromZero={true} // Garante que o eixo Y comece em 0
                 yAxisInterval={1} // Define o intervalo do eixo Y como 1
                 chartConfig={{
@@ -63,4 +70,8 @@ const styles = StyleSheet.create({
         color: "#3F704D",
     },
 });
+
+
+
+export default ChartsRoute
 
