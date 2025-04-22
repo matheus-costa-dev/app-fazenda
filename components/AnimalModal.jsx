@@ -1,7 +1,11 @@
-import { Modal, Text, TextInput, Button, StyleSheet, View } from "react-native"
+import { Modal, Text, Button, StyleSheet, View } from "react-native"
 import RenderInput from "../components/RenderInput"
+import { useRef } from "react"
 
 export default function AnimalModal({ modalVisible, setModalVisible, animal, setAnimal, titleSubmitButton, onSubmit }) {
+    const specieRef = useRef(null)
+    const weightRef = useRef(null)
+
     return (
         <Modal
             visible={modalVisible}
@@ -19,6 +23,7 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
                     setValue={(text)=> setAnimal({ ...animal, nome: text })}
                     isPassword={false}
                     keyboardType={"default"}
+                    onSubmitEditing={() => specieRef.current?.focus()}
                     />
 
                     <RenderInput 
@@ -28,6 +33,8 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
                     setValue={(text) => setAnimal({ ...animal, especie: text })}
                     isPassword={false}
                     keyboardType={"default"}
+                    ref={specieRef}
+                    onSubmitEditing={() => weightRef.current?.focus()}
                     />
                     
                     <RenderInput 
@@ -37,6 +44,7 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
                         setValue={(text) => setAnimal({ ...animal, peso: text})}
                         keyboardType="decimal-pad"
                         isPassword={false}
+                        ref={weightRef}
                     />
                     
                     {/* Booleans podem ser checkboxes/switches futuramente */}

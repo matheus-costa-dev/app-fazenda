@@ -1,12 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { View, TextInput, StyleSheet } from "react-native";
+import { forwardRef } from "react";
 
-export default function RenderInput( {icon, placeholder, value, setValue, isPassword, keyboardType}) {
-
+function RenderInput({ icon, placeholder, value, setValue, isPassword, keyboardType, onSubmitEditing }, ref) {
     return (
         <View style={styles.inputContainer}>
-            {/* <Icon name={icon} size={20} color="#6c63ff" style={styles.inputIcon} /> */}
-            <Ionicons name={icon} size={20} color={"#6c63ff"} style={styles.inputIcon}/>
+            <Ionicons name={icon} size={20} color={"#6c63ff"} style={styles.inputIcon} />
             <TextInput
                 placeholder={placeholder}
                 style={styles.input}
@@ -15,11 +14,14 @@ export default function RenderInput( {icon, placeholder, value, setValue, isPass
                 placeholderTextColor="#aaa"
                 secureTextEntry={isPassword}
                 keyboardType={keyboardType}
+                onSubmitEditing={onSubmitEditing}
+                ref={ref} // Encaminha a ref para o TextInput
             />
-        </View> 
-    )
-};
+        </View>
+    );
+}
 
+export default forwardRef(RenderInput);
 
 const styles = StyleSheet.create({
     inputContainer: {
@@ -43,6 +45,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 20,
     },
-
-})
+});
 

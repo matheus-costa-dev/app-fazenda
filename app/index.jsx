@@ -1,6 +1,6 @@
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter, useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FloatButton from "../components/FloatButton"
 import CustomModal from "../components/CustomModal";
 import RenderInput from "../components/RenderInput";
@@ -24,6 +24,7 @@ export default function Index() {
   const [isEditing, setIsEditing] = useState(false);
   const [editFarmId, setEditFarmId] = useState("")
   const [dataLoading, setDataLoading] = useState(true)
+  const addressRef = useRef(null)
 
   
 
@@ -163,6 +164,7 @@ export default function Index() {
           setValue={setNewFarmName}
           isPassword={false}
           keyboardType={"default"}
+          onSubmitEditing={() => addressRef.current?.focus()}
         />
         <RenderInput
           icon={"location-outline"}
@@ -171,6 +173,8 @@ export default function Index() {
           setValue={setNewFarmAddress}
           isPassword={false}
           keyboardType={"default"}
+          ref={addressRef}
+          onSubmitEditing={() => isEditing ? onHandleEditFarm() : onHandleAddFarm()}
         />
 
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>

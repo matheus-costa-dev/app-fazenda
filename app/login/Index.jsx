@@ -8,7 +8,7 @@ import {
     ScrollView,
     ActivityIndicator
 } from "react-native";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import CustomModal from "../../components/CustomModal";
 import RenderInput from "../../components/RenderInput";
 import CustomButton from "../../components/CustomButton";
@@ -18,6 +18,8 @@ import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "expo-router";
 import { AlertMessage } from "../../functions/Alert";
 
+
+
 export default function LoginScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [email, setEmail] = useState("");
@@ -25,13 +27,18 @@ export default function LoginScreen() {
     const [nome, setNome] = useState("");
     const { signIn, signUp, loading, user } = useAuth()
     const router = useRouter()
+    const passwordRef = useRef(null);
+    const nomeRef = useRef(null);
+    const emailCadastroRef = useRef(null);
+    const senhaCadastroRef = useRef(null);
+
 
     function isFormInvalid(...args) {
         const system = Platform.OS
 
         if (!args.every(arg => arg)) {
 
-           AlertMessage("Preencha todos os campos")
+            AlertMessage("Preencha todos os campos")
 
             return true;
         }
@@ -76,97 +83,106 @@ export default function LoginScreen() {
             router.replace("/")
 
         } catch (error) {
-            AlertMessage(`Erro ao criar conta\n${error.message}`)            
+            AlertMessage(`Erro ao criar conta\n${error.message}`)
         }
 
         setModalVisible(false);
     }
 
-    return (
-        <View contentContainerStyle={styles.container}>
-            {loading ? (
+    if (loading) {
+        return (
+            <View contentContainerStyle={styles.container}>
                 <ActivityIndicator />
-            ) : (
-                <ScrollView contentContainerStyle={styles.container}>
-                    <Text style={styles.title}>Bem-vindo de volta 👋</Text>
+            </View>
+        )
+    }
 
-                    <RenderInput
-                        icon={"mail-outline"}
-                        placeholder={"Email"}
-                        value={email}
-                        setValue={setEmail}
-                        isPassword={false}
-                        keyboardType={"email-address"}
+    return (
+
+        <ScrollView contentContainerStyle={styles.container}>
+            <Text style={styles.title}>Bem-vindo de volta 👋</Text>
+
+            <RenderInput
+                icon={"mail-outline"}
+                placeholder={"Email"}
+                value={email}
+                setValue={setEmail}
+                isPassword={false}
+                keyboardType={"email-address"}
+                onSubmitEditing={() => passwordRef.current?.focus()}
+            />
+
+            <RenderInput
+                icon={"lock-closed-outline"}
+                placeholder={"Senha"}
+                value={password}
+                setValue={setPassword}
+                isPassword={true}
+                onSubmitEditing={onSignIn}
+                ref={passwordRef}
+            />
+
+            <CustomButton buttonText={"Entrar"} customButtonStyle={{ color: "white" }} onPress={onSignIn} />
+
+            <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.linkContainer}>
+                <Text style={styles.linkText}>Não tem uma conta?</Text>
+                <Text style={[styles.linkText, { fontWeight: "bold", color: "#6c63ff" }]}> Cadastre-se</Text>
+            </TouchableOpacity>
+
+            <CustomModal
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+                modalTitle={"Cadastrar"}
+            >
+
+                <RenderInput
+                    icon={"person-outline"}
+                    placeholder={"Nome"}
+                    value={nome}
+                    setValue={setNome}
+                    isPassword={false}
+                    onSubmitEditing={() => emailCadastroRef.current?.focus()}
+                />
+
+                <RenderInput
+                    icon={"mail"}
+                    placeholder={"Email"}
+                    value={email}
+                    setValue={setEmail}
+                    isPassword={false}
+                    keyboardType={"email-address"}
+                    onSubmitEditing={() => senhaCadastroRef.current?.focus()}
+                />
+
+                <RenderInput
+                    icon={"lock-closed-outline"}
+                    placeholder={"Senha"}
+                    value={password}
+                    setValue={setPassword}
+                    isPassword={true}
+                    onSubmitEditing={onSignUp}
+                />
+
+                <View style={styles.modalButtons}>
+
+                    <CustomButton
+                        buttonText={"Cancelar"}
+                        onPress={() => setModalVisible(false)}
+                        customTouchableStyle={{ backgroundColor: "white", borderWidth: 1, borderColor: "red" }}
+                        customButtonStyle={styles.cancelButton}
                     />
 
-                    <RenderInput
-                        icon={"lock-closed-outline"}
-                        placeholder={"Senha"}
-                        value={password}
-                        setValue={setPassword}
-                        isPassword={true}
+                    <CustomButton
+                        buttonText={"Cadastrar"}
+                        onPress={onSignUp}
+                        customButtonStyle={{ color: "white" }}
                     />
 
-                    <CustomButton buttonText={"Entrar"} customButtonStyle={{ color: "white" }} onPress={onSignIn} />
 
-                    <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.linkContainer}>
-                        <Text style={styles.linkText}>Não tem uma conta?</Text>
-                        <Text style={[styles.linkText, { fontWeight: "bold", color: "#6c63ff" }]}> Cadastre-se</Text>
-                    </TouchableOpacity>
+                </View>
+            </CustomModal>
+        </ScrollView >
 
-                    <CustomModal
-                        modalVisible={modalVisible}
-                        setModalVisible={setModalVisible}
-                        modalTitle={"Cadastrar"}
-                    >
-
-                        <RenderInput
-                            icon={"person-outline"}
-                            placeholder={"Nome"}
-                            value={nome}
-                            setValue={setNome}
-                            isPassword={false}
-                        />
-
-                        <RenderInput
-                            icon={"mail"}
-                            placeholder={"Email"}
-                            value={email}
-                            setValue={setEmail}
-                            isPassword={false}
-                            keyboardType={"email-address"}
-                        />
-
-                        <RenderInput
-                            icon={"lock-closed-outline"}
-                            placeholder={"Senha"}
-                            value={password}
-                            setValue={setPassword}
-                            isPassword={true}
-                        />
-
-                        <View style={styles.modalButtons}>
-
-                            <CustomButton
-                                buttonText={"Cancelar"}
-                                onPress={() => setModalVisible(false)}
-                                customTouchableStyle={{ backgroundColor: "white", borderWidth: 1, borderColor: "red" }}
-                                customButtonStyle={styles.cancelButton}
-                            />
-
-                            <CustomButton
-                                buttonText={"Cadastrar"}
-                                onPress={onSignUp}
-                                customButtonStyle={{ color: "white" }}
-                            />
-
-
-                        </View>
-                    </CustomModal>
-                </ScrollView >
-            )}
-
-        </View>
     );
 }
 

@@ -1,4 +1,4 @@
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useState } from "react";
 import AnimalModal from "../AnimalModal";
 import Cards from "../Cards";
