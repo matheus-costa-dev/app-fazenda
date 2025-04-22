@@ -2,14 +2,22 @@ import CustomButton from "@/components/CustomButton";
 import { StyleSheet } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "expo-router";
+import { AlertMessage } from "@/functions/Alert";
+
+
 
 export default function LogoutButton() {
     const { signOut } = useAuth();
     const router = useRouter();
-  
     const handleLogout = () => {
-      signOut();
-      router.replace("/")
+
+      try {
+        signOut();
+        router.replace("/login")
+      } catch (error) {
+        console.error(error)
+      }
+ 
     };
   
     return (
@@ -17,22 +25,19 @@ export default function LogoutButton() {
         buttonText={"Logout"}
         customTouchableStyle={styles.customTouchableStyle}
         customButtonStyle={styles.customButtonStyle}
-        onPress={handleLogout}
+        onPressIn={handleLogout}
       />
     );
   }
 
   const styles = StyleSheet.create({
-    customTouchableStyle: {
+    customTouchableStyle:   {
       backgroundColor: "#A62C2C",
-      justifyContent: "center",
-      alignItems: "center",
-      borderRadius: 10,
-      marginBottom: "auto",
-      marginRight: 10,
+      borderRadius: 20,
+      marginBottom:"10%"
     },
     customButtonStyle: {
       color: "#fff",
-      fontSize: 16,
+      fontSize: 12,
     },
   });

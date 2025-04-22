@@ -1,35 +1,34 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import { useWindowDimensions } from "react-native";
-import * as aq from "arquero";
-import { op } from "arquero"
 
 export default function ChartsRoute({ filteredAnimals }) {
-
-    
-    if (filteredAnimals.length === 0) {
-        return null
+    if (!filteredAnimals || filteredAnimals.length === 0) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.chartsText}>Nenhum dado disponível para exibir gráficos.</Text>
+            </View>
+        );
     }
 
     const windowWidth = useWindowDimensions().width;
     const windowHeight = useWindowDimensions().height;
-    const df = aq.from(filteredAnimals)
-    const df_plot = df
-        .fold(["cio", "prenha", "inseminado"], { as: ["category", "value"] })
-        .select(["category", "value"])
-        .groupby("category")
-        .rollup({ value_sum: op.sum("value") })
+
+    // Processamento dos dados sem arquero
+    const categories = ["cio", "prenha", "inseminado"];
+    const dataByCategory = categories.map((category) => {
+        const valueSum = filteredAnimals.reduce((sum, animal) => sum + (animal[category] || 0), 0);
+        return { category, valueSum };
+    });
 
     const chartData = {
-        labels: df_plot.objects().map((item) => item.category),
+        labels: dataByCategory.map((item) => item.category),
         datasets: [
             {
-                data: df_plot.objects().map((item) => item.value_sum)
-            }
-        ]
-    }
-
-
+                data: dataByCategory.map((item) => item.valueSum),
+            },
+        ],
+    };
 
     return (
         <View style={styles.container}>
@@ -64,3 +63,4 @@ const styles = StyleSheet.create({
         color: "#3F704D",
     },
 });
+

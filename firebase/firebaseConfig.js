@@ -1,6 +1,7 @@
-import {initializeApp} from "firebase/app"
-import {getAuth} from "firebase/auth"
-import {getFirestore} from "firebase/firestore"
+import { initializeApp } from "firebase/app";
+import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAUsAwgXakyKIRxQrMWH0JgD3A66ugXZxE",
@@ -9,9 +10,13 @@ const firebaseConfig = {
     storageBucket: "app-fazenda-7177d.firebasestorage.app",
     messagingSenderId: "1015528821359",
     appId: "1:1015528821359:web:bd63615a48fea98de3b39a",
-    measurementId: "G-6HJ773KSJC"
-  };
+    measurementId: "G-6HJ773KSJC",
+};
 
-export const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
-export const db = getFirestore(app)
+export const app = initializeApp(firebaseConfig);
+
+export const auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+});
+
+export const db = getFirestore(app);

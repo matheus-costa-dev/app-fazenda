@@ -1,4 +1,4 @@
-import { Dimensions, ScrollView } from "react-native";
+import { Dimensions, ScrollView, View, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router"
 import { useEffect, useState } from "react";
 import { TabView, TabBar } from "react-native-tab-view"
@@ -9,12 +9,14 @@ import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
 
+
 function Animals() {
-    const { user } = useAuth()
+    const { user, loading } = useAuth()
     const { id } = useLocalSearchParams();
     const navigation = useNavigation();
-    const [filteredAnimals, setFilteredAnimals] = useState([])
+    const [filteredAnimals, setFilteredAnimals] = useState([]);
     const [farmName, setFarmName] = useState("")
+    const [dataLoading, setDataLoading] = useState(true)
 
     useEffect(() => {
 
@@ -43,24 +45,41 @@ function Animals() {
 
         setFilteredAnimals(farmAnimals || []);
         setFarmName(userData.fazendas.find((farm) => farm.id === id)?.name)
+        setDataLoading(false)
 
     }
 
     const renderScene = ({ route }) => {
         switch (route.key) {
             case 'list':
-                return <ListRoute
-                    filteredAnimals={filteredAnimals}
-                    setFilteredAnimals={setFilteredAnimals}
-                    farmId={id} />
+                return (
+                    <ListRoute
+                        filteredAnimals={filteredAnimals}
+                        setFilteredAnimals={setFilteredAnimals}
+                        farmId={id}
+                    />
+                );
             case 'metrics':
-                return <MetricsRoute filteredAnimals={filteredAnimals} />
+                return <MetricsRoute filteredAnimals={filteredAnimals} />;
             case 'charts':
-                return <ChartsRoute filteredAnimals={filteredAnimals} />
+                return <ChartsRoute filteredAnimals={filteredAnimals} />;
             default:
-                return null;
+                return (
+                    <View>
+                        <Text>Rota inválida.</Text>
+                    </View>
+                );
         }
     };
+
+
+    if (loading || dataLoading) {
+        return (
+            <View style={{flex:1, justifyContent:"center",alignContent:"center", backgroundColor:"#DBFFCB"}}>
+                <ActivityIndicator  size={"large"}  />
+            </View>
+        )
+    }
 
     return (
         <TabView

@@ -129,7 +129,6 @@ export default function ListRoute({ filteredAnimals, setFilteredAnimals, farmId 
 
     return (
         <View style={styles.container}>
-            <ScrollView>
                 {filteredAnimals.length > 0 ?
                     <Cards
                         data={filteredAnimals}
@@ -140,7 +139,6 @@ export default function ListRoute({ filteredAnimals, setFilteredAnimals, farmId 
                     /> :
                     <Cards data={[{ id: 1, title: "Nenhum animal cadastrado" }]} />
                 }
-            </ScrollView>
 
             <FloatButton onPress={onAdd} iconName={"add-outline"} />
 

@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet } from "react-native"
+import { ScrollView, StyleSheet, View } from "react-native"
 import Cards from "../Cards"
 
 export default function MetricsRoute({ filteredAnimals }) {
@@ -45,16 +45,13 @@ export default function MetricsRoute({ filteredAnimals }) {
 
 
     return (
-        <ScrollView style={styles.metrics}>
-
-            {filteredAnimals.length > 0 ?
-                <Cards
-                    data={data} /> :
+        <View style={styles.metrics}>
+            {filteredAnimals.length > 0 ? (
+                <Cards data={data} />
+            ) : (
                 <Cards data={[{ id: 1, title: "Nenhum animal encontrado" }]} />
-            }
-
-
-        </ScrollView>
+            )}
+        </View>
     )
 }
 

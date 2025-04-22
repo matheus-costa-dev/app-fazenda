@@ -1,10 +1,11 @@
 import {TouchableOpacity, Text, StyleSheet} from "react-native"
 
-export default function CustomButton( {onPress ,buttonText, customTouchableStyle, customButtonStyle} ) {
+export default function CustomButton( {onPress ,onPressIn,buttonText, customTouchableStyle, customButtonStyle} ) {
     return (
         <TouchableOpacity
             style={[styles.button, customTouchableStyle]}
-            onPress={() => onPress()}
+            onPress={onPress}
+            onPressIn={onPressIn}
         >
             <Text style={[styles.buttonText, { paddingHorizontal: 10 }, customButtonStyle]}> {buttonText} </Text>
         </TouchableOpacity>

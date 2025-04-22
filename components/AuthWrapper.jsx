@@ -1,6 +1,8 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { View, ActivityIndicator } from "react-native";
+
 
 export default function AuthWrapper({ children }) {
   const { user, loading, signOut } = useAuth();
@@ -12,7 +14,13 @@ export default function AuthWrapper({ children }) {
     }
   }, [user, loading]);
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return children;
 }

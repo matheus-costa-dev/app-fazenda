@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import FloatButton from "../components/FloatButton"
@@ -9,6 +9,7 @@ import Cards from "../components/Cards";
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import 'react-native-get-random-values';
 import { v4 } from "uuid"
 import { AlertMessage } from "@/functions/Alert";
 
@@ -19,9 +20,12 @@ export default function Index() {
   const [newFarmName, setNewFarmName] = useState("");
   const [newFarmAddress, setNewFarmAddress] = useState("");
   const [farms, setFarms] = useState([]);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editFarmId, setEditFarmId] = useState("")
+  const [dataLoading, setDataLoading] = useState(true)
+
+  
 
   useEffect(() => {
     navigation.setOptions({
@@ -40,16 +44,19 @@ export default function Index() {
     const userSnapshot = await getDoc(userDoc);
     const userData = userSnapshot.data();
     setFarms(userData.fazendas || []);
+
+    setDataLoading(false)
   }
 
   async function onHandleAddFarm() {
-    const newFarm = {
-      id: v4(),
-      name: newFarmName,
-      localization: newFarmAddress,
-    };
-
+ 
     try {
+      const newFarm = {
+        id: v4(),
+        name: newFarmName,
+        localization: newFarmAddress,
+      };
+  
       const userDoc = doc(db, "users", user.uid);
       await updateDoc(userDoc, {
         fazendas: arrayUnion(newFarm),
@@ -60,6 +67,7 @@ export default function Index() {
       setNewFarmName("");
       setNewFarmAddress("");
     } catch (error) {
+      console.error(error)
       AlertMessage(`Erro ao adicionar fazenda\n${error.message}`)
     }
 
@@ -75,13 +83,14 @@ export default function Index() {
   }
 
   async function onHandleEditFarm(){
-    const farmEdit ={
-      id: editFarmId,
-      name: newFarmName,
-      localization: newFarmAddress,
-    }
+
 
     try {
+      const farmEdit ={
+        id: editFarmId,
+        name: newFarmName,
+        localization: newFarmAddress,
+      }
       const userDoc = doc(db, "users",user.uid)
       await updateDoc(userDoc, {
         fazendas: arrayRemove(farms.find(farm => farm.id === editFarmId))
@@ -122,6 +131,17 @@ export default function Index() {
   function onCardPress(id){
     router.push(`/animals/${id}`);
   }
+
+
+  if (loading || dataLoading) {
+    return (
+        <View style={{flex:1, justifyContent:"center",alignContent:"center", backgroundColor:"#DBFFCB"}}>
+            <ActivityIndicator size={"large"} />
+        </View>
+    )
+}
+
+
 
   return (
     <View style={styles.container}>
