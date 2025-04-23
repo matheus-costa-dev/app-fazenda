@@ -9,7 +9,7 @@ import { Picker } from '@react-native-picker/picker';
 
 
 
-export default function AnimalModal({ modalVisible, setModalVisible, animal, setAnimal, titleSubmitButton, onSubmit }) {
+export default function AnimalModal({ modalVisible, setModalVisible, animal, setAnimal, titleSubmitButton, onSubmit, onPressCancel }) {
     const specieRef = useRef(null)
     const weightRef = useRef(null)
     const [showDateInseminacao, setShowDateInseminacao] = useState(false)
@@ -215,7 +215,10 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
 
                         <CustomButton
                             buttonText={"Cancelar"}
-                            onPress={() => setModalVisible(false)}
+                            onPress={() => {
+                                setModalVisible(false)
+                                onPressCancel()
+                            }}
                             customTouchableStyle={buttonCancelStyle.customTouchableStyle}
                             customButtonStyle={buttonCancelStyle.customButtonStyle}
                         />

@@ -44,8 +44,8 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                             <>
                                 {renderKeys.map((key) => {
                                     const val = item[key]
-                                    // console.log(val instanceof Object)
-                                    // return console.log(key,val)
+
+                                    if (!val || val =="") return null
                                     if (val != undefined) {
                                         if (key === "title") {
                                             return (
@@ -55,27 +55,8 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                                             );
                                         }
 
-                                        if (val instanceof Object) {
+                                        
 
-                                            return (
-                                                <Text style={styles.cardText} key={key}>
-                                                    <Text style={{ fontWeight: "bold", paddingHorizontal: 5 }}>{key}: </Text>
-                                                    <Text>{formatFirebaseDate(val)}</Text>
-                                                </Text>
-                                            )
-
-
-                                        }
-
-                                        if (val instanceof Date) {
-                                            return (
-
-                                                <Text style={styles.cardText} key={key}>
-                                                    <Text style={{ fontWeight: "bold", paddingHorizontal: 5 }}>{key}: </Text>
-                                                    <Text>{val.toLocaleDateString("pt-BR")}</Text>
-                                                </Text>
-                                            )
-                                        }
                                         return (
                                             <Text style={styles.cardText} key={key}>
                                                 <Text style={{ fontWeight: "bold", paddingHorizontal: 5 }}>{key}: </Text>

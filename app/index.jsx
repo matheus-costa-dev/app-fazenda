@@ -8,7 +8,7 @@ import CustomButon from "../components/CustomButton";
 import Cards from "../components/Cards";
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import 'react-native-get-random-values';
 import { v4 } from "uuid"
 import { AlertMessage } from "@/functions/Alert";
@@ -73,8 +73,9 @@ export default function Index() {
         fazendas: arrayUnion(newFarm),
       })
 
-      fetchData()
+      setFarms(prev => [...prev, newFarm])
       setModalVisible(false);
+      clearForm()
 
     } catch (error) {
       console.error(error)
@@ -109,56 +110,51 @@ export default function Index() {
         email: newFarmEmail,
         telefone: newFarmPhone,
       }
+
+      const updatedFarms = [
+        ...farms.filter(farm => farm.id !== editFarmId),
+        farmEdit
+      ];
+
       const userDoc = doc(db, "users", user.uid)
       await updateDoc(userDoc, {
-        fazendas: arrayRemove(farms.find(farm => farm.id === editFarmId))
-      })
-
-      await updateDoc(userDoc, {
-        fazendas: arrayUnion(farmEdit)
+        fazendas: updatedFarms
       })
 
       setIsEditing(false)
       setModalVisible(false)
 
-      setFarms((prev) => {
-        return [...prev.filter(farm => farm.id !== editFarmId), farmEdit]
-      })
+      setFarms(updatedFarms)
 
+      
+      clearForm()
     } catch (error) {
       AlertMessage(`Erro ao editar fazenda\n${error.message}`)
     }
 
   }
 
-
   async function onDelete(farmId) {
-
     try {
-      const userDoc = doc(db, "users", user.uid)
-      const farmToDelete = farms.find(farm => farm.id == farmId)
+      // Remove a fazenda do array
+      const updatedFarms = farms.filter(farm => farm.id !== farmId);
+      const updatedAnimals = animals.filter(animal => animal.farmId !== farmId);
+  
+      const userDoc = doc(db, "users", user.uid);
       await updateDoc(userDoc, {
-        fazendas: arrayRemove(farmToDelete)
+        fazendas: updatedFarms,
+        animais: updatedAnimals
       });
-
-      setFarms((prev) => {
-        return prev.filter(farm => farm.id !== farmId)
-      })
-
-      const animalToRemove = animals.find((animal) => animal.farmId === farmId);
-
-      if (animalToRemove) {
-        await updateDoc(userDoc, {
-          animais: arrayRemove(animalToRemove)
-        });
-      }
-
+  
+      // Atualiza o estado local
+      setFarms(updatedFarms);
+  
     } catch (error) {
-      console.log(error)
-      AlertMessage(error)
+      console.error(error);
+      AlertMessage(`Erro ao deletar fazenda\n${error.message}`);
     }
-
   }
+  
 
   function onCardPress(id) {
     router.push(`/animals/${id}`);
@@ -269,7 +265,6 @@ export default function Index() {
             buttonText={isEditing ? "Editar" : "Adicionar"}
             onPress={() => {
               isEditing ? onHandleEditFarm() : onHandleAddFarm()
-              clearForm()
             }}
             customButtonStyle={{ color: "#fff", backgroundColor: "#4CAF50" }} // verde mais claro
             customTouchableStyle={{ backgroundColor: "#4CAF50" }} // verde mais claro
