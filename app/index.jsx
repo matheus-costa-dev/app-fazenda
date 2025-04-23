@@ -1,4 +1,4 @@
-import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import { useRouter, useNavigation } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import FloatButton from "../components/FloatButton"
@@ -12,6 +12,8 @@ import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import 'react-native-get-random-values';
 import { v4 } from "uuid"
 import { AlertMessage } from "@/functions/Alert";
+import { appStyles} from "../styles/app"
+import { checkFormFarm } from "@/functions/app";
 
 export default function Index() {
   const router = useRouter();
@@ -59,6 +61,7 @@ export default function Index() {
   async function onHandleAddFarm() {
 
     try {
+
       const newFarm = {
         id: v4(),
         nome: newFarmName,
@@ -67,6 +70,10 @@ export default function Index() {
         email: newFarmEmail,
         telefone: newFarmPhone,
       };
+
+      if (!checkFormFarm(newFarm)){
+        return
+      }
 
       const userDoc = doc(db, "users", user.uid);
       await updateDoc(userDoc, {
@@ -110,6 +117,10 @@ export default function Index() {
         email: newFarmEmail,
         telefone: newFarmPhone,
       }
+    
+      if (!checkFormFarm(farmEdit)){
+        return
+      }
 
       const updatedFarms = [
         ...farms.filter(farm => farm.id !== editFarmId),
@@ -135,8 +146,10 @@ export default function Index() {
   }
 
   async function onDelete(farmId) {
+
+    setDataLoading(true)
     try {
-      // Remove a fazenda do array
+      
       const updatedFarms = farms.filter(farm => farm.id !== farmId);
       const updatedAnimals = animals.filter(animal => animal.farmId !== farmId);
   
@@ -153,6 +166,8 @@ export default function Index() {
       console.error(error);
       AlertMessage(`Erro ao deletar fazenda\n${error.message}`);
     }
+
+    setDataLoading(false)
   }
   
 
@@ -172,7 +187,7 @@ export default function Index() {
 
   if (loading || dataLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignContent: "center", backgroundColor: "#DBFFCB" }}>
+      <View style={appStyles.container}>
         <ActivityIndicator size={"large"} />
       </View>
     )
@@ -181,13 +196,15 @@ export default function Index() {
 
 
   return (
-    <View style={styles.container}>
+    <View style={appStyles.container}>
       <Cards
         data={farms}
         icons={true}
+        leftIcons={true}
         onEdit={onEdit}
         onDelete={onDelete}
         onCardPress={onCardPress}
+        renderKeys={["nome","proprietario","endereco","email","telefone"]}
       />
 
 
@@ -249,7 +266,7 @@ export default function Index() {
           onSubmitEditing={() => isEditing ? onHandleEditFarm() : onHandleAddFarm()}
         />
 
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View style={appStyles.modalActionsButtons}>
           <CustomButon
             buttonText={"Cancelar"}
             onPress={() => { 
@@ -257,7 +274,8 @@ export default function Index() {
               setIsEditing(false)
               clearForm()
             }}
-            customTouchableStyle={styles.cancelButton}
+            customTouchableStyle={appStyles.customTouchableStyleCancel}
+            customButtonStyle={appStyles.customButtonStyleCancel}
             
           />
 
@@ -266,8 +284,8 @@ export default function Index() {
             onPress={() => {
               isEditing ? onHandleEditFarm() : onHandleAddFarm()
             }}
-            customButtonStyle={{ color: "#fff", backgroundColor: "#4CAF50" }} // verde mais claro
-            customTouchableStyle={{ backgroundColor: "#4CAF50" }} // verde mais claro
+            customTouchableStyle={appStyles.customTouchableStyleSubmit} // verde mais claro
+            customButtonStyle={appStyles.customButtonStyleSubmit} // verde mais claro
           />
         </View>
 
@@ -276,36 +294,3 @@ export default function Index() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#DBFFCB", // fundo leve e agradável
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-  },
-  card: {
-    backgroundColor: "#A8D5BA", // verde mais fechado e bonito
-    padding: 20,
-    marginVertical: 10,
-    borderRadius: 16,
-    width: "100%",
-    elevation: 3, // sombra para Android
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#2F4F4F", // verde escuro, estilo floresta
-    marginBottom: 6,
-  },
-  cardSubtitle: {
-    fontSize: 16,
-    color: "#3F704D", // tom mais escuro mas ainda natural
-  },
-  cancelButton: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ff4d4d",
-  },
-
-});

@@ -16,16 +16,17 @@ import { db } from "../../firebase/firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "expo-router";
 import { AlertMessage } from "../../functions/Alert";
-import {buttonCancelStyle, buttonSubmitStyle} from "../../styles/app"
-
+import { appStyles } from "../../styles/app"
+import { isEmailValid, isPasswordValid } from "../../functions/app"
 
 
 export default function LoginScreen() {
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisibleResetPassword, setModalVisibleResetPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [nome, setNome] = useState("");
-    const { signIn, signUp, loading, user } = useAuth()
+    const { signIn, signUp, loading, resetPassword } = useAuth()
     const router = useRouter()
     const passwordRef = useRef(null);
     const nomeRef = useRef(null);
@@ -55,6 +56,14 @@ export default function LoginScreen() {
 
         try {
 
+            if(!isEmailValid(email)){
+                return null
+            }
+
+            if(!isPasswordValid(password)){
+                return null
+            }
+
             await signIn(email, password)
             router.replace("/")
 
@@ -70,6 +79,14 @@ export default function LoginScreen() {
         }
 
         try {
+
+            if(!isEmailValid(email)){
+                return null
+            }
+            if(!isPasswordValid(password)){
+                return null
+            }
+
             const newUser = await signUp(email, password)
             const userDoc = doc(db, "users", newUser.uid)
             await setDoc(userDoc, {
@@ -89,6 +106,21 @@ export default function LoginScreen() {
         setModalVisible(false);
     }
 
+    async function onHandleResetPassword() {
+
+        try {
+            if(!isEmailValid(email)){
+                return null
+            }
+            await resetPassword(email)
+            AlertMessage("E-mail de redefinição enviado! Verifique sua caixa de entrada e o lixo eletrônico.")
+            setModalVisibleResetPassword(false)
+        } catch (error) {
+            console.error('Erro ao enviar e-mail:', error.message);
+            AlertMessage(`Falha ao enviar e-mail: ${error.message}`);
+        }
+    }
+
     if (loading) {
         return (
             <View contentContainerStyle={styles.container}>
@@ -97,9 +129,11 @@ export default function LoginScreen() {
         )
     }
 
+
+
     return (
 
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={appStyles.container}>
             <Text style={styles.title}>Bem-vindo de volta 👋</Text>
 
             <RenderInput
@@ -122,12 +156,28 @@ export default function LoginScreen() {
                 ref={passwordRef}
             />
 
-            <CustomButton buttonText={"Entrar"} customButtonStyle={{ color: "white" }} onPress={onSignIn} />
+            <CustomButton buttonText={"Entrar"}
+                customTouchableStyle={appStyles.customTouchableStyleSubmit}
+                customButtonStyle={appStyles.customButtonStyleSubmit}
+                onPress={onSignIn} />
 
-            <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.linkContainer}>
+
+
+            <TouchableOpacity
+                onPress={() => setModalVisibleResetPassword(true)}
+                style={styles.linkContainer}>
+                <Text style={styles.linkText}>Esqueceu a senha? ?</Text>
+                <Text style={[styles.linkText, { fontWeight: "bold", color: "#6c63ff" }]}> clique aqui</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={() => setModalVisible(true)}
+                style={styles.linkContainer}>
                 <Text style={styles.linkText}>Não tem uma conta?</Text>
                 <Text style={[styles.linkText, { fontWeight: "bold", color: "#6c63ff" }]}> Cadastre-se</Text>
             </TouchableOpacity>
+
+
 
             <CustomModal
                 modalVisible={modalVisible}
@@ -163,20 +213,58 @@ export default function LoginScreen() {
                     onSubmitEditing={onSignUp}
                 />
 
-                <View style={styles.modalButtons}>
+                <View style={appStyles.modalActionsButtons}>
 
                     <CustomButton
                         buttonText={"Cancelar"}
                         onPress={() => setModalVisible(false)}
-                        customTouchableStyle={buttonCancelStyle.customTouchableStyle}
-                        customButtonStyle={buttonCancelStyle.customButtonStyle}
+                        customTouchableStyle={appStyles.customTouchableStyleCancel}
+                        customButtonStyle={appStyles.customButtonStyleCancel}
+
                     />
 
                     <CustomButton
                         buttonText={"Cadastrar"}
                         onPress={onSignUp}
-                        customTouchableStyle={buttonSubmitStyle.customTouchableStyle}
-                        customButtonStyle={buttonSubmitStyle.customButtonStyle}
+                        customTouchableStyle={appStyles.customTouchableStyleSubmit}
+                        customButtonStyle={appStyles.customButtonStyleSubmit}
+                    />
+
+
+                </View>
+            </CustomModal>
+
+
+            <CustomModal
+                modalVisible={modalVisibleResetPassword}
+                setModalVisible={setModalVisibleResetPassword}
+                modalTitle={"Recuperar acesso"}
+            >
+                <RenderInput
+                    icon={"mail"}
+                    placeholder={"Email"}
+                    value={email}
+                    setValue={setEmail}
+                    isPassword={false}
+                    keyboardType={"email-address"}
+                    onSubmitEditing={onHandleResetPassword}
+                />
+
+                <View style={appStyles.modalActionsButtons}>
+
+                    <CustomButton
+                        buttonText={"Cancelar"}
+                        onPress={() => setModalVisibleResetPassword(false)}
+                        customTouchableStyle={appStyles.customTouchableStyleCancel}
+                        customButtonStyle={appStyles.customButtonStyleCancel}
+
+                    />
+
+                    <CustomButton
+                        buttonText={"Enviar"}
+                        onPress={onHandleResetPassword}
+                        customTouchableStyle={appStyles.customTouchableStyleSubmit}
+                        customButtonStyle={appStyles.customButtonStyleSubmit}
                     />
 
 
@@ -188,21 +276,13 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        justifyContent: "center",
-        padding: 24,
-        backgroundColor: "#f4e7ff",
-    },
+
     title: {
         fontSize: 28,
         fontWeight: "700",
         textAlign: "center",
         marginBottom: 32,
         color: "#333",
-    },
-    cancelButton: {
-        color: "red",
     },
     linkContainer: {
         flexDirection: "row",
@@ -212,11 +292,5 @@ const styles = StyleSheet.create({
     linkText: {
         color: "#555",
         fontSize: 16,
-    },
-    modalButtons: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        marginTop: 24,
-        gap: 12,
     },
 });

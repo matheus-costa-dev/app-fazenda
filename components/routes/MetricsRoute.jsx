@@ -1,5 +1,6 @@
-import { ScrollView, StyleSheet, View } from "react-native"
+import { View } from "react-native"
 import Cards from "../Cards"
+import { appStyles } from "../../styles/app"
 
 export default function MetricsRoute({ filteredAnimals }) {
     const total = filteredAnimals.length
@@ -45,7 +46,7 @@ export default function MetricsRoute({ filteredAnimals }) {
 
 
     return (
-        <View style={styles.metrics}>
+        <View style={appStyles.container}>
             {filteredAnimals.length > 0 ? (
                 <Cards data={data} />
             ) : (
@@ -55,16 +56,3 @@ export default function MetricsRoute({ filteredAnimals }) {
     )
 }
 
-
-const styles = StyleSheet.create({
-    metrics: {
-        backgroundColor: "#DBFFCB",
-        flex: 1,
-        paddingHorizontal: 20,
-    },
-    metricText: {
-        fontSize: 18,
-        marginVertical: 8,
-        color: "#3F704D",
-    },
-})

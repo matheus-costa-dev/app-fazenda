@@ -1,14 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View, TextInput, StyleSheet } from "react-native";
+import { View, TextInput } from "react-native";
 import { forwardRef } from "react";
+import { appStyles, colors } from "@/styles/app";
 
 function RenderInput({ icon, placeholder, value, setValue, isPassword, keyboardType, onSubmitEditing, onPress, editable }, ref) {
     return (
-        <View style={styles.inputContainer}>
-            <Ionicons name={icon} size={20} color={"#6c63ff"} style={styles.inputIcon} />
+        <View style={appStyles.inputContainer}>
+            <Ionicons 
+            name={icon} 
+            size={20} 
+            color={colors.inputIcon} 
+            style={appStyles.inputIcon} />
             <TextInput
                 placeholder={placeholder}
-                style={styles.input}
+                style={appStyles.input}
                 value={value}
                 onChangeText={setValue}
                 placeholderTextColor="#aaa"
@@ -24,28 +29,4 @@ function RenderInput({ icon, placeholder, value, setValue, isPassword, keyboardT
 }
 
 export default forwardRef(RenderInput);
-
-const styles = StyleSheet.create({
-    inputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 12,
-        backgroundColor: "#fff",
-        paddingHorizontal: 12,
-        marginBottom: 16,
-    },
-    inputIcon: {
-        marginRight: 8,
-    },
-    input: {
-        flex: 1,
-        height: 50,
-        fontSize: 16,
-        color: "#333",
-        paddingHorizontal: 20,
-        borderRadius: 20,
-    },
-});
 

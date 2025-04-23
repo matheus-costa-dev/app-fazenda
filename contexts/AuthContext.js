@@ -2,7 +2,8 @@ import { createContext, useContext, useState, useEffect } from "react";
 import {
     onAuthStateChanged,
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail
 } from "firebase/auth";
 import { auth } from "../firebase/firebaseConfig";
 
@@ -34,7 +35,7 @@ export function AuthProvider({ children }) {
 
     }
 
-    async function signUp(email, password){
+    async function signUp(email, password) {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password)
             setUser(userCredential.user)
@@ -54,8 +55,18 @@ export function AuthProvider({ children }) {
         }
     }
 
+    async function resetPassword(email) {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            console.log("E-mail de redefinição enviado com sucesso!");
+            // Você pode mostrar uma notificação ou feedback para o usuário
+        } catch (error) {
+            console.error("Erro ao enviar e-mail:", error.message);
+        }
+    }
+
     return (
-        <authContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+        <authContext.Provider value={{ user, loading, signIn, signUp, signOut, resetPassword }}>
             {children}
         </authContext.Provider>
     );

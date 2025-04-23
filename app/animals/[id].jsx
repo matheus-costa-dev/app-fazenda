@@ -1,4 +1,4 @@
-import { Dimensions, ScrollView, View, ActivityIndicator } from "react-native";
+import { Dimensions, View, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router"
 import { useEffect, useState } from "react";
 import { TabView, TabBar } from "react-native-tab-view"
@@ -8,6 +8,7 @@ import ChartsRoute from "../../components/routes/ChartsRoute";
 import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
+import { tabViewStyles, appStyles } from "../../styles/app";
 
 
 function Animals() {
@@ -76,7 +77,7 @@ function Animals() {
 
     if (loading || dataLoading) {
         return (
-            <View style={{flex:1, justifyContent:"center",alignContent:"center", backgroundColor:"#DBFFCB"}}>
+            <View style={appStyles.container}>
                 <ActivityIndicator  size={"large"}  />
             </View>
         )
@@ -91,9 +92,9 @@ function Animals() {
             renderTabBar={(props) => (
                 <TabBar
                     {...props}
-                    indicatorStyle={{ backgroundColor: "#3F704D" }}
-                    style={{ backgroundColor: "#A8D5BA" }}
-                    labelStyle={{ color: "#2F4F4F", fontWeight: "bold" }}
+                    indicatorStyle={tabViewStyles.indicatorStyle}
+                    style={tabViewStyles.tabBarStyle}
+                    labelStyle={tabViewStyles.labelStyle}
                 />
             )}
         />

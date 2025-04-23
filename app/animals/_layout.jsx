@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { headerColor, statusBarBG, styles} from "../../styles/header"
+import { headerStyles } from "../../styles/app";
 
 
 export default function AnimalsLayout() {
@@ -7,9 +7,9 @@ export default function AnimalsLayout() {
     screenOptions={{
         headerShown: true,
         headerTitleAlign: "center",
-        headerStyle: styles.header,
-        statusBarBackgroundColor:statusBarBG,
-        headerTintColor:headerColor
+        headerStyle: headerStyles.header,
+        headerTintColor:headerStyles.header.color,
+        statusBarBackgroundColor:headerStyles.statusbar.backgroundColor,
     }}
   />;
 }

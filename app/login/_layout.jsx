@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { headerColor, statusBarBG, styles} from "../../styles/header"
+import { headerStyles } from "@/styles/app";
 
 
 export default function LoginLayout(){
@@ -8,9 +8,9 @@ export default function LoginLayout(){
                 title: "Login",
                 headerTitleAlign: "center",
                 headerBackButtonMenuEnabled: false,
-                headerStyle: styles.header,
-                statusBarBackgroundColor:statusBarBG,
-                headerTintColor:headerColor
+                headerStyle: headerStyles.header,
+                headerTintColor:headerStyles.header.color,
+                statusBarBackgroundColor:headerStyles.statusbar.backgroundColor,
             }}
         />
 }

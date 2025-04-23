@@ -1,47 +1,55 @@
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { cardStyles } from "@/styles/app";
+import {openWhatsApp, sendEmail} from "../functions/app"
 
-export default function Cards({ data, icons, onEdit, onDelete, onCardPress, renderKeys }) {
 
-    function formatFirebaseDate(timestamp) {
-        if (!timestamp || !timestamp.seconds) return "";
-
-        const date = new Date(timestamp.seconds * 1000);
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0"); // mês começa do zero
-        const year = date.getFullYear();
-
-        return `${day}/${month}/${year}`;
-    }
-
+export default function Cards({ data, icons, leftIcons, onEdit, onDelete, onCardPress, renderKeys }) {
 
     return (
         <FlatList
             data={data}
             keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
             renderItem={({ item }) => {
-                // Componente de conteúdo do card (reutilizável)
-
                 const CardContent = () => (
                     <>
                         {icons && (
-                            <View style={styles.cardIcons}>
-                                <Ionicons
-                                    name="pencil-outline"
-                                    style={styles.cardEditIcon}
-                                    onPress={() => onEdit(item)}
-                                />
-                                <Ionicons
-                                    name="trash-outline"
-                                    style={styles.cardDeletIcon}
-                                    onPress={() => onDelete(item.id)}
-                                />
+                            <View style={cardStyles.cardIcons}>
+                                {/* Grupo da esquerda - só aparece se leftIcons for true */}
+                                {leftIcons && (
+                                    <View style={cardStyles.cardIconsGroup}>
+                                        <Ionicons
+                                            name="logo-whatsapp"
+                                            style={cardStyles.cardWhatsappIcon}
+                                            onPress={() => openWhatsApp(item.telefone)}
+                                        />
+                                        <Ionicons
+                                            name="mail-outline"
+                                            style={cardStyles.cardEmailIcon}
+                                            onPress={() => sendEmail(item.email)}
+                                        />
+                                    </View>
+                                )}
+                                
+                                {/* Grupo da direita - sempre aparece quando icons é true */}
+                                <View style={[cardStyles.cardIconsGroup, !leftIcons && { marginLeft: "auto" }]}>
+                                    <Ionicons
+                                        name="pencil-outline"
+                                        style={cardStyles.cardEditIcon}
+                                        onPress={() => onEdit(item)}
+                                    />
+                                    <Ionicons
+                                        name="trash-outline"
+                                        style={cardStyles.cardDeletIcon}
+                                        onPress={() => onDelete(item.id)}
+                                    />
+                                </View>
                             </View>
                         )}
 
+                        {/* Restante do conteúdo do card... */}
                         {renderKeys ? (
-
-                            <>
+                                <>
                                 {renderKeys.map((key) => {
                                     const val = item[key]
 
@@ -49,8 +57,8 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                                     if (val != undefined) {
                                         if (key === "title") {
                                             return (
-                                                <View style={styles.cardTitle} key={key}>
-                                                    <Text style={styles.cardTitleText}>{val}</Text>
+                                                <View style={cardStyles.cardTitle} key={key}>
+                                                    <Text style={cardStyles.cardTitleText}>{val}</Text>
                                                 </View>
                                             );
                                         }
@@ -58,7 +66,7 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                                         
 
                                         return (
-                                            <Text style={styles.cardText} key={key}>
+                                            <Text style={cardStyles.cardText} key={key}>
                                                 <Text style={{ fontWeight: "bold", paddingHorizontal: 5 }}>{key}: </Text>
                                                 <Text>{typeof val === "boolean" ? (val ? "Sim" : "Não") : val}</Text>
                                             </Text>
@@ -71,13 +79,13 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                                     if (["farmId", "id"].includes(key)) return null;
                                     if (key === "title") {
                                         return (
-                                            <View style={styles.cardTitle} key={`${key}-${index}`}>
-                                                <Text style={styles.cardTitleText}>{val}</Text>
+                                            <View style={cardStyles.cardTitle} key={`${key}-${index}`}>
+                                                <Text style={cardStyles.cardTitleText}>{val}</Text>
                                             </View>
                                         );
                                     }
                                     return (
-                                        <Text style={styles.cardText} key={`${key}-${index}`}>
+                                        <Text style={cardStyles.cardText} key={`${key}-${index}`}>
                                             <Text style={{ fontWeight: "bold", paddingHorizontal: 5 }}>
                                                 {key}:
                                             </Text>
@@ -88,20 +96,15 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
                                     );
                                 })}
                             </>)}
-
-
                     </>
                 );
 
                 return onCardPress ? (
-                    <TouchableOpacity
-                        style={styles.card}
-                        onPress={() => onCardPress(item.id)}
-                    >
+                    <TouchableOpacity style={cardStyles.card} onPress={() => onCardPress(item.id)}>
                         <CardContent />
                     </TouchableOpacity>
                 ) : (
-                    <View style={styles.card}>
+                    <View style={cardStyles.card}>
                         <CardContent />
                     </View>
                 );
@@ -114,45 +117,3 @@ export default function Cards({ data, icons, onEdit, onDelete, onCardPress, rend
         />
     )
 }
-
-const styles = StyleSheet.create({
-    card: {
-        backgroundColor: "#A8D5BA",
-        padding: 20,
-        marginVertical: 10,
-        borderRadius: 16,
-        width: "100%",
-        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-        elevation: 3,
-    },
-    cardIcons: {
-        display: "flex",
-        flexDirection: "row",
-        gap: 15,
-        justifyContent: "flex-end",
-    },
-    cardEditIcon: {
-        fontSize: 26,
-        color: "orange",
-    },
-    cardDeletIcon: {
-        fontSize: 26,
-        color: "red",
-    },
-    cardTitle: {
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    cardTitleText: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "#2F4F4F",
-        marginBottom: 6,
-        alignItems: "center"
-    },
-    cardText: {
-        fontSize: 16,
-        color: "#3F704D",
-        marginBottom: 6,
-    }
-})

@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { View, ActivityIndicator } from "react-native";
+import { appStyles } from "@/styles/app";
 
 
 export default function AuthWrapper({ children }) {
@@ -16,7 +17,7 @@ export default function AuthWrapper({ children }) {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={appStyles.container}>
         <ActivityIndicator size="large" />
       </View>
     );

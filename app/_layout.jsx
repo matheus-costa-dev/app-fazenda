@@ -2,7 +2,7 @@ import { Stack, useRouter, useRootNavigationState } from "expo-router";
 import { AuthProvider } from "../contexts/AuthContext";
 import AuthWrapper from "../components/AuthWrapper";
 import LogoutButton from "../components/LogoutButton";
-import { headerColor, statusBarBG, styles} from "../styles/header"
+import { headerStyles } from "@/styles/app";
 import { useEffect, useRef } from "react";
 
 export default function RootLayout() {
@@ -27,9 +27,9 @@ export default function RootLayout() {
             headerShown: false,
             headerTitleAlign: "center",
             headerRight: () => <LogoutButton />,
-            headerStyle: styles.header,
-            statusBarBackgroundColor:statusBarBG,
-            headerTintColor:headerColor
+            headerStyle: headerStyles.header,
+            headerTintColor:headerStyles.header.color,
+            statusBarBackgroundColor:headerStyles.statusbar.backgroundColor,
 
           }}
         />

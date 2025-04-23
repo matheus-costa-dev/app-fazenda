@@ -1,13 +1,15 @@
 import { View, StyleSheet, Text, Dimensions } from "react-native";
 import { BarChart } from "react-native-chart-kit";
+import { appStyles  } from "../../styles/app";
+import Cards from "../Cards"
 
 function ChartsRoute({ filteredAnimals }) {
     const {width, height} = Dimensions.get("window")
 
     if (!filteredAnimals || filteredAnimals.length === 0) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.chartsText}>Nenhum dado disponível para exibir gráficos.</Text>
+            <View style={appStyles.container}>
+                 <Cards data={[{ id: 1, title: "Nenhum dado disponível para exibir gráficos" }]} />
             </View>
         );
     }
@@ -38,7 +40,7 @@ function ChartsRoute({ filteredAnimals }) {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={appStyles.container}>
             <BarChart
                 data={chartData}
                 width={width * 0.9}
