@@ -8,11 +8,11 @@ import CustomButon from "../components/CustomButton";
 import Cards from "../components/Cards";
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import 'react-native-get-random-values';
 import { v4 } from "uuid"
 import { AlertMessage } from "@/functions/Alert";
-import { appStyles} from "../styles/app"
+import { appStyles } from "../styles/app"
 import { checkFormFarm } from "@/functions/app";
 
 export default function Index() {
@@ -52,7 +52,28 @@ export default function Index() {
 
     const userDoc = doc(db, "users", user.uid);
     const userSnapshot = await getDoc(userDoc);
+
+    if (!userSnapshot.exists()) {
+      
+      console.log("Documento NÃO existe");
+      await setDoc(userDoc, {
+        nome: "",
+        email: user.email,
+        fazendas: [],
+        animais: [],
+        criadoEm: new Date(),
+        atualizadoEm: new Date(),
+      })
+      console.log("feito a criação")
+
+      setTimeout(()=> {}, 5000)
+    }
+
+
+
     const userData = userSnapshot.data();
+
+
     setFarms(userData.fazendas || []);
     setAnimals(userData.animais || [])
     setDataLoading(false)
@@ -71,7 +92,7 @@ export default function Index() {
         telefone: newFarmPhone,
       };
 
-      if (!checkFormFarm(newFarm)){
+      if (!checkFormFarm(newFarm)) {
         return
       }
 
@@ -101,7 +122,7 @@ export default function Index() {
     setNewFarmAddress(farm.endereco);
     setNewFarmEmail(farm.email)
     setNewFarmPhone(farm.telefone)
-    
+
 
   }
 
@@ -117,8 +138,8 @@ export default function Index() {
         email: newFarmEmail,
         telefone: newFarmPhone,
       }
-    
-      if (!checkFormFarm(farmEdit)){
+
+      if (!checkFormFarm(farmEdit)) {
         return
       }
 
@@ -137,7 +158,7 @@ export default function Index() {
 
       setFarms(updatedFarms)
 
-      
+
       clearForm()
     } catch (error) {
       AlertMessage(`Erro ao editar fazenda\n${error.message}`)
@@ -149,19 +170,19 @@ export default function Index() {
 
     setDataLoading(true)
     try {
-      
+
       const updatedFarms = farms.filter(farm => farm.id !== farmId);
       const updatedAnimals = animals.filter(animal => animal.farmId !== farmId);
-  
+
       const userDoc = doc(db, "users", user.uid);
       await updateDoc(userDoc, {
         fazendas: updatedFarms,
         animais: updatedAnimals
       });
-  
+
       // Atualiza o estado local
       setFarms(updatedFarms);
-  
+
     } catch (error) {
       console.error(error);
       AlertMessage(`Erro ao deletar fazenda\n${error.message}`);
@@ -169,13 +190,13 @@ export default function Index() {
 
     setDataLoading(false)
   }
-  
+
 
   function onCardPress(id) {
     router.push(`/animals/${id}`);
   }
 
-  function clearForm(){
+  function clearForm() {
     setNewFarmName("");
     setNewFarmOwner("")
     setNewFarmAddress("");
@@ -204,16 +225,16 @@ export default function Index() {
         onEdit={onEdit}
         onDelete={onDelete}
         onCardPress={onCardPress}
-        renderKeys={["nome","proprietario","endereco","email","telefone"]}
+        renderKeys={["nome", "proprietario", "endereco", "email", "telefone"]}
       />
 
 
       <FloatButton iconName={"add-outline"} onPress={() => setModalVisible(true)} />
-      <CustomModal 
-      modalTitle={"Adicionar fazenda"} 
-      modalVisible={modalVisible} 
-      setModalVisible={setModalVisible}
-      onRequestClose={clearForm}
+      <CustomModal
+        modalTitle={"Adicionar fazenda"}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        onRequestClose={clearForm}
       >
         <RenderInput
           icon={"home-outline"}
@@ -269,14 +290,14 @@ export default function Index() {
         <View style={appStyles.modalActionsButtons}>
           <CustomButon
             buttonText={"Cancelar"}
-            onPress={() => { 
+            onPress={() => {
               setModalVisible(false)
               setIsEditing(false)
               clearForm()
             }}
             customTouchableStyle={appStyles.customTouchableStyleCancel}
             customButtonStyle={appStyles.customButtonStyleCancel}
-            
+
           />
 
           <CustomButon

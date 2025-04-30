@@ -10,6 +10,7 @@ import { v4 } from "uuid"
 import { AlertMessage } from "../../functions/Alert";
 import { checkFormAnimal, parseAnimalToSubmit, transformToDate } from "../../functions/app";
 import { appStyles } from "../../styles/app";
+import CustomButton from "../CustomButton";
 
 
 export default function ListRoute({ filteredAnimals, setFilteredAnimals, farmId }) {
@@ -17,19 +18,14 @@ export default function ListRoute({ filteredAnimals, setFilteredAnimals, farmId 
         farmId,
         id: "", //id do animal
         nome: "",
-        especie: "",
-        peso: "", // apagar
-        cio: false,
-        prenha: false,
-        inseminado: false,
         dataNacimento: new Date(),
+        peso: "", // apagar
+        obs: "",
+        cio: false,
         dataCio: new Date(),
+        prenha: false,
         dataPrenha: new Date(),
-        dataInseminacao: new Date(),
-        dataConfirmacaoInseminacao: new Date(),
-        dataPrevisaoParto: new Date(),
-        tipoInseminacao: "",
-        touroUsadoInseminacao: ""
+        inseminacao: [],
     }
 
     const { user } = useAuth();
@@ -38,14 +34,14 @@ export default function ListRoute({ filteredAnimals, setFilteredAnimals, farmId 
     const [isEditing, setIsEditing] = useState(false);
     const [isSubmting, setIsSubmting] = useState(false)
 
-    const renderKeys = Object.keys(newAnimal).filter((key) => !["farmId", "id"].includes(key));
+    const renderKeys = Object.keys(newAnimal).filter((key) => !["farmId", "id", "inseminacao"].includes(key));
 
     function onAdd() {
 
         setIsEditing(false);
         setModalVisible(true);
     }
-    
+
 
     async function onSubmitAdd() {
 
@@ -148,7 +144,7 @@ export default function ListRoute({ filteredAnimals, setFilteredAnimals, farmId 
 
     if (isSubmting) {
         <View style={appStyles.container}>
-            <ActivityIndicator size={"large"}/>
+            <ActivityIndicator size={"large"} />
         </View>
     }
 
@@ -161,6 +157,9 @@ export default function ListRoute({ filteredAnimals, setFilteredAnimals, farmId 
                     onEdit={onEdit}
                     onDelete={onDelete}
                     renderKeys={renderKeys}
+                    buttonInseminacao={true}
+                    
+
                 /> :
                 <Cards data={[{ id: 1, title: "Nenhum animal cadastrado" }]} />
             }

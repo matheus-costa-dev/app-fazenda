@@ -18,6 +18,7 @@ import { useRouter } from "expo-router";
 import { AlertMessage } from "../../functions/Alert";
 import { appStyles } from "../../styles/app"
 import { isEmailValid, isPasswordValid } from "../../functions/app"
+import { updateProfile } from "firebase/auth";
 
 
 export default function LoginScreen() {
@@ -97,6 +98,7 @@ export default function LoginScreen() {
                 criadoEm: new Date(),
                 atualizadoEm: new Date(),
             })
+            await updateProfile(newUser,{displayName: nome})
             router.replace("/")
 
         } catch (error) {

@@ -40,10 +40,10 @@ export function checkFormAnimal(animal) {
         AlertMessage("Preencha o nome do animal");
         return false;
     }
-    if (!animal.especie || animal.especie === "") {
-        AlertMessage("Preencha a espécie do animal");
-        return false;
-    }
+    // if (!animal.especie || animal.especie === "") {
+    //     AlertMessage("Preencha a espécie do animal");
+    //     return false;
+    // }
     if (!animal.peso || animal.peso === "") {
         AlertMessage("Preencha o peso do animal");
         return false;
@@ -220,3 +220,22 @@ export const sendEmail = (to) => {
       alert('Não foi possível abrir o cliente de e-mail.');
     });
   };
+
+
+  
+  export function formatDate(date) {
+    if (!date) return "";
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Mês começa em 0
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+export function getBirthEstimate(date, string) {
+    // return console.log(date instanceof Date)
+    const futureDate = new Date(date)
+    futureDate.setDate(futureDate.getDate() + 190) // 190 dias == 6 meses e alguns dias
+    const dateString = futureDate.toLocaleDateString()
+    return string ? dateString : futureDate
+
+}

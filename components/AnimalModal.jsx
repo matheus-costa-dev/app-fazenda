@@ -5,40 +5,25 @@ import CustomButton from "../components/CustomButton"
 import RenderInputDate from "./RenderInputDate"
 import { buttonStatusAnimalStyle, appStyles } from "../styles/app"
 import DatePickerToggle from "./DatePickerToggle"
-import { Picker } from '@react-native-picker/picker';
-
+import { useRouter } from "expo-router"
+import { formatDate } from "../functions/app"
 
 
 export default function AnimalModal({ modalVisible, setModalVisible, animal, setAnimal, titleSubmitButton, onSubmit, onPressCancel }) {
-    const specieRef = useRef(null)
+    const dataNascimentoRef = useRef(null)
     const weightRef = useRef(null)
-    const [showDateInseminacao, setShowDateInseminacao] = useState(false)
+    const obsRef = useRef(null)
     const [showDateCio, setShowDateCio] = useState(false)
     const [showDatePrenha, setShowDatePrenha] = useState(false)
     const [showBirdthDate, setShowBirdthDate] = useState(false)
-    const [showDateConfirmationInseminacao, setShowDateConfirmationInseminacao] = useState(false)
+    const router = useRouter()
 
 
-    function formatDate(date) {
-        if (!date) return "";
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0"); // Mês começa em 0
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    }
-
-    function getBirthEstimate(date, string) {
-        // return console.log(date instanceof Date)
-        const futureDate = new Date(date)
-        futureDate.setDate(futureDate.getDate() + 190) // 190 dias == 6 meses e alguns dias
-        const dateString = futureDate.toLocaleDateString()
-        return string ? dateString : futureDate
-
-    }
 
     function modalContent() {
         return (
             <View>
+
                 <Text style={appStyles.modalTitle}>Novo Animal</Text>
                 <RenderInput
                     icon={"id-card-outline"}
@@ -47,29 +32,9 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
                     setValue={(text) => setAnimal({ ...animal, nome: text })}
                     isPassword={false}
                     keyboardType={"default"}
-                    onSubmitEditing={() => specieRef.current?.focus()}
+                    onSubmitEditing={() => dataNascimentoRef.current?.focus()}
                 />
 
-                <RenderInput
-                    placeholder={"Espécie"}
-                    icon={"logo-octocat"}
-                    value={animal.especie}
-                    setValue={(text) => setAnimal({ ...animal, especie: text })}
-                    isPassword={false}
-                    keyboardType={"default"}
-                    ref={specieRef}
-                    onSubmitEditing={() => weightRef.current?.focus()}
-                />
-
-                <RenderInput
-                    placeholder="Peso"
-                    icon={"barbell-outline"}
-                    value={animal.peso}
-                    setValue={(text) => setAnimal({ ...animal, peso: text })}
-                    keyboardType="decimal-pad"
-                    isPassword={false}
-                    ref={weightRef}
-                />
 
                 <Text>Data de nascimento</Text>
                 <RenderInputDate
@@ -78,6 +43,7 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
                     value={formatDate(animal.dataNacimento)}
                     editable={false}
                     onPress={() => setShowBirdthDate(true)}
+                    onSubmitEditing={() => weightRef.current?.focus()}
                 />
 
                 <DatePickerToggle
@@ -86,6 +52,28 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
                     onChange={(date) => setAnimal({ ...animal, dataNacimento: date })}
                     onClose={() => setShowBirdthDate(false)}
                 />
+
+
+                <RenderInput
+                    placeholder="Peso"
+                    icon={"barbell-outline"}
+                    value={animal.peso}
+                    setValue={(text) => setAnimal({ ...animal, peso: text })}
+                    keyboardType="decimal-pad"
+                    isPassword={false}
+                    onSubmitEditing={() => obsRef.current?.focus()}
+                />
+
+                <RenderInput
+                    placeholder="Obs"
+                    icon={"document-outline"}
+                    value={animal.obs}
+                    setValue={(text) => setAnimal({ ...animal, obs: text })}
+                    keyboardType="default"
+                    isPassword={false}
+                    ref={obsRef}
+                />
+
 
                 {/* Booleans podem ser checkboxes/switches futuramente */}
                 <View style={{ flexDirection: "row", gap: 10, borderRadius: 25, justifyContent: "center", flexWrap: "wrap", }}>
@@ -134,77 +122,21 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
 
 
 
-                    <CustomButton
-                        buttonText={`Inseminado: ${animal.inseminado ? (
-                            `Sim\n${formatDate(animal.dataInseminacao)}`
-
-                        ) : "Não"}`}
-                        onPress={() => {
-                            setAnimal({ ...animal, inseminado: !animal.inseminado, tipoInseminacao: !animal.inseminado ? "Monta" : "" })
-                            !animal.inseminado ? setShowDateInseminacao(true) : setShowDateInseminacao(false)
-                        }}
-                        customTouchableStyle={buttonStatusAnimalStyle.customTouchableStyle}
-                        customButtonStyle={buttonStatusAnimalStyle.customButtonStyle}
-                    />
-
-
-                    <DatePickerToggle
-                        show={showDateInseminacao}
-                        value={animal.dataInseminacao}
-                        onChange={(date) => setAnimal({ ...animal, dataInseminacao: date, dataPrevisaoParto: getBirthEstimate(date, false) })}
-                        onClose={() => setShowDateInseminacao(false)}
-                    />
-
-
                 </View>
 
-                {animal.inseminado ? (
-                    <View style={{ marginTop: 30 }}>
-                        <Text>Dia da confirmação da inseminação</Text>
-                        <RenderInputDate
-                            icon={"calendar-clear-outline"}
-                            editable={false}
-                            onPress={() => setShowDateConfirmationInseminacao(true)}
-                            value={formatDate(animal.dataConfirmacaoInseminacao)}
-                        />
 
-                        <DatePickerToggle
-                            value={animal.dataConfirmacaoInseminacao}
-                            show={showDateConfirmationInseminacao}
-                            onChange={(date) => setAnimal({
-                                ...animal,
-                                dataConfirmacaoInseminacao: date,
-                                dataPrevisaoParto: getBirthEstimate(date, false)
-                            })}
-                            onClose={() => setShowDateConfirmationInseminacao(false)}
-                        />
+                {/* <CustomButton
+                    buttonText={"Inseminação >"}
+                    onPress={() => {
+                        console.log(animal)
+                        router.push({
+                            pathname: "inseminacao",
+                            params: { data: JSON.stringify(animal.inseminacao) }
+                        })
+                    }}
+                /> */}
 
 
-                        <Text>Data da previsão do parto</Text>
-                        <RenderInput
-                            editable={false}
-                            icon={"calendar-outline"}
-                            value={formatDate(animal.dataPrevisaoParto)}
-                        />
-
-
-                        <Text>Tipo de insimenição</Text>
-                        <Picker
-                            selectedValue={animal.tipoInseminacao}
-                            onValueChange={(tipo) => setAnimal({ ...animal, tipoInseminacao: tipo })}
-                        >
-                            <Picker.Item label="Monta" value="Monta" />
-                            <Picker.Item label="Inseminação artificial" value="Inseminação artificial" />
-                        </Picker>
-
-                        <RenderInput
-                            icon={"paw-outline"}
-                            placeholder={"Touro usado"}
-                            value={animal.touroUsadoInseminacao}
-                            setValue={(text) => setAnimal({ ...animal, touroUsadoInseminacao: text })} />
-                    </View>
-
-                ) : (null)}
 
                 <View style={appStyles.modalActionsButtons}>
 
@@ -237,18 +169,9 @@ export default function AnimalModal({ modalVisible, setModalVisible, animal, set
             onRequestClose={() => setModalVisible(false)}
         >
             <View style={appStyles.modalOverlay}>
-                {!animal.inseminado ?
-                    (
-                        <View style={appStyles.modalContent}>
-                            {modalContent()}
-                        </View>
-
-                    ) :
-                    <ScrollView style={appStyles.modalContent}>
-                        {modalContent()}
-                        <Text></Text>
-                    </ScrollView>
-                }
+                <View style={appStyles.modalContent}>
+                    {modalContent()}
+                </View>
             </View>
         </Modal>
 

@@ -5,7 +5,7 @@ import { appStyles } from "../../styles/app"
 export default function MetricsRoute({ filteredAnimals }) {
     const total = filteredAnimals.length
     const mediaPeso = filteredAnimals.reduce((ac, curr) => ac + curr.peso, 0) / total
-    const { inseminado, prenha, cio } = getAnimalsStatus()
+    const { inseminacao, prenha, cio } = getAnimalsStatus()
     const data = [
         {
             id: 1,
@@ -16,31 +16,42 @@ export default function MetricsRoute({ filteredAnimals }) {
         {
             id: 2,
             title: "Inseminação",
-            "quantidade de animais": inseminado,
-            "taxa de serviço": "R$ " + inseminado * 100,
+            "quantidade de animais": inseminacao,
+            "taxa de serviço":  toPercentage(inseminacao, total),
         },
         {
             id: 3,
-            title: "Prenha",
-            "quantidade de animais": prenha,
-            "taxa de concepção": "R$ " + prenha * 100,
+            title:"Cio",
+            "quantidade de animais": cio,
+            "Taxa de detecção do cio": toPercentage(cio, total),
         },
         {
             id: 4,
-            title: "Cio",
-            "quantidade de animais": cio,
-            "taxa de detecção": "R$ " + cio * 100,
+            title: "Prenha",
+            "quantidade de animais": prenha,
+            "taxa de prenhez": toPercentage(prenha,inseminacao),
+            "taxa de concepção": toPercentage(prenha, total),
         },
+
     ]
 
+    function toPercentage(val, total){
+        return " "+ (val/total * 100).toFixed(2).toString() + "%"
+    }
 
 
 
     function getAnimalsStatus() {
-        return {
-            inseminado: filteredAnimals.filter((animal) => animal.inseminado).length,
-            prenha: filteredAnimals.filter((animal) => animal.prenha).length,
-            cio: filteredAnimals.filter((animal) => animal.cio).length,
+        const totalInseminacao =  filteredAnimals.reduce((acc, cur) => acc + cur.inseminacao.length ,0)
+        const inseminacao = filteredAnimals.reduce((acc, cur) => cur.inseminacao.length > 0 ?  acc + 1 : acc, 0)
+        const prenha = filteredAnimals.reduce((acc, cur) => cur.prenha ? acc + 1 : acc, 0)
+        const cio = filteredAnimals.reduce((acc, cur) => cur.cio ? acc + 1 : acc, 0)
+
+
+        return {  
+            inseminacao,
+            prenha,
+            cio
         }
     }
 

@@ -1,10 +1,14 @@
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { cardStyles } from "@/styles/app";
-import {openWhatsApp, sendEmail} from "../functions/app"
+import { appStyles, cardStyles } from "@/styles/app";
+import { openWhatsApp, sendEmail } from "../functions/app"
+import CustomButton from "./CustomButton";
+import { useRouter } from "expo-router";
 
 
-export default function Cards({ data, icons, leftIcons, onEdit, onDelete, onCardPress, renderKeys }) {
+export default function Cards({ data, icons, leftIcons, onEdit, onDelete, onCardPress, renderKeys, buttonInseminacao }) {
+
+    const router = useRouter()
 
     return (
         <FlatList
@@ -30,7 +34,7 @@ export default function Cards({ data, icons, leftIcons, onEdit, onDelete, onCard
                                         />
                                     </View>
                                 )}
-                                
+
                                 {/* Grupo da direita - sempre aparece quando icons é true */}
                                 <View style={[cardStyles.cardIconsGroup, !leftIcons && { marginLeft: "auto" }]}>
                                     <Ionicons
@@ -49,11 +53,11 @@ export default function Cards({ data, icons, leftIcons, onEdit, onDelete, onCard
 
                         {/* Restante do conteúdo do card... */}
                         {renderKeys ? (
-                                <>
+                            <>
                                 {renderKeys.map((key) => {
                                     const val = item[key]
 
-                                    if (!val || val =="") return null
+                                    if (!val || val == "") return null
                                     if (val != undefined) {
                                         if (key === "title") {
                                             return (
@@ -63,7 +67,7 @@ export default function Cards({ data, icons, leftIcons, onEdit, onDelete, onCard
                                             );
                                         }
 
-                                        
+
 
                                         return (
                                             <Text style={cardStyles.cardText} key={key}>
@@ -95,7 +99,20 @@ export default function Cards({ data, icons, leftIcons, onEdit, onDelete, onCard
                                         </Text>
                                     );
                                 })}
-                            </>)}
+                            </>)
+                        }
+                        {buttonInseminacao ? (
+                            <>
+                                <CustomButton
+                                    buttonText={"Inseminação >"}
+                                    customButtonStyle={appStyles.customButtonStyleSubmit}
+                                    customTouchableStyle={appStyles.customTouchableStyleSubmit}
+                                    onPress={() => {
+                                        router.push("inseminacao/" + item.id)
+                                    }}
+                                />
+                            </>
+                        ) : null}
                     </>
                 );
 
