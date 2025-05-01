@@ -9,6 +9,8 @@ import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { tabViewStyles, appStyles } from "../../styles/app";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 
 function Animals() {
@@ -29,6 +31,23 @@ function Animals() {
 
 
     }, [farmName])
+
+    useFocusEffect(
+        useCallback(() => {
+          // Esta função roda toda vez que o usuário volta para a tela
+      
+          console.log("Usuário voltou para a tela de Animals");
+      
+          // Exemplo: atualizar dados ao voltar
+          fetchData();
+      
+          // Se quiser limpar algo ao sair da tela, retorne uma função de cleanup:
+          return () => {
+            console.log("Saindo da tela de Animals");
+          };
+        }, [])
+      );
+      
 
     const [index, setIndex] = useState(0);
     const [routes] = useState([

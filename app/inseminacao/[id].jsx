@@ -76,8 +76,8 @@ export default function Inseminacao() {
 
 
             const parsedInseminacaoToSubmit = {
-                id: v4(),
                 ...newInseminacao,
+                id: v4(),
                 dataInseminacao: formatDate(newInseminacao.dataInseminacao),
                 dataConfirmacao: formatDate(newInseminacao.dataConfirmacao),
             }

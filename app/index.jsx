@@ -54,7 +54,6 @@ export default function Index() {
     const userSnapshot = await getDoc(userDoc);
 
     if (!userSnapshot.exists()) {
-      
       console.log("Documento NÃO existe");
       await setDoc(userDoc, {
         nome: "",
@@ -64,16 +63,20 @@ export default function Index() {
         criadoEm: new Date(),
         atualizadoEm: new Date(),
       })
-      console.log("feito a criação")
-
-      setTimeout(()=> {}, 5000)
+      console.log("feito a criação");
+    
+      const newSnapshot = await getDoc(userDoc);
+      const userData = newSnapshot.data();
+    
+      setFarms(userData.fazendas || []);
+      setAnimals(userData.animais || []);
+      setDataLoading(false);
+      return;
     }
 
 
 
     const userData = userSnapshot.data();
-
-
     setFarms(userData.fazendas || []);
     setAnimals(userData.animais || [])
     setDataLoading(false)
