@@ -62,7 +62,7 @@ O aplicativo foi desenhado para atender às necessidades essenciais do pecuarist
 <img width="200" height="995" alt="Captura de Tela (47)" src="https://github.com/user-attachments/assets/d8c30c1e-de79-4f9f-9d3d-9d9a3cb01332" />
 <img width="200" height="1003" alt="Captura de Tela (48)" src="https://github.com/user-attachments/assets/9b10d10f-bd23-4cea-9572-089a4ad1abd4" />
 
-
+---
 
 ## 🛠️ Tecnologias Utilizadas
 
