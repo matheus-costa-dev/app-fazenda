@@ -48,11 +48,21 @@ O aplicativo foi desenhado para atender às necessidades essenciais do pecuarist
 
 ## 📱 Telas do Aplicativo
 
-**Substitua as URLs abaixo pelos links das capturas de tela do seu aplicativo.** Você pode hospedar as imagens no próprio GitHub (arrastando e soltando em um "Issue") ou em um serviço como o Imgur.
+| Tela de Login |Tela de Cadastro | Dashboard Principal |
+| :---: | :---: || :---: | :---: |
 
-| Tela de Login | Dashboard Principal |
-| :---: | :---: |
-| |
+|<img width="595" height="1080" alt="Captura de Tela (32)" src="https://github.com/user-attachments/assets/1942c0f5-f03f-41a2-81dc-cbe545a3a414" /> |
+|<img width="605" height="1080" alt="Captura de Tela (33)" src="https://github.com/user-attachments/assets/8134d8fc-e3fd-4820-89f9-da7492eece80" /> |
+<img width="601" height="1080" alt="Captura de Tela (34)" src="https://github.com/user-attachments/assets/3ee5fb15-23c2-4643-a8ac-6e5d1755ca77" />
+<img width="593" height="1080" alt="Captura de Tela (35)" src="https://github.com/user-attachments/assets/8960f6cb-146b-4eb2-b21c-c5d92c34abed" />
+<img width="604" height="1080" alt="Captura de Tela (36)" src="https://github.com/user-attachments/assets/cc041b3a-f393-4bce-be27-ea440256f387" />
+<img width="604" height="1080" alt="Captura de Tela (37)" src="https://github.com/user-attachments/assets/f508042b-60f8-47fb-8ebd-380780d9bffa" />
+
+
+
+
+
+
 
 | Lista de Animais | Detalhes do Animal (Inseminações) |
 | :---: | :---: |
